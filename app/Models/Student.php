@@ -11,6 +11,7 @@ class Student extends User
 
     public function weeklyShedule()
     {
-        return $this->belongsToMany(WeeklySchedule::class, 'user_id', 'id');
+        return $this->belongsToMany(WeeklySchedule::class,
+            'user_weekly_schedule', 'user_id', 'w_s_id')->withTimestamps();
     }
 }

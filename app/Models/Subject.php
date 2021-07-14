@@ -11,7 +11,20 @@ class Subject extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_subject', 'user_id',
-            'subject_id')->withPivot('subject_in_charge');
+        return $this->belongsToMany(User::class, 'user_subject', 'subject_id',
+            'user_id'
+            )
+            ->withPivot('subject_in_charge')
+            ->withTimestamps();
+    }
+
+    public function courses()
+    {
+        return $this->belongsToMany(Subject::class)->withTimestamps();
+    }
+
+    public function weeklySchedules()
+    {
+        return $this->belongsToMany(WeeklySchedule::class)->withTimestamps();
     }
 }

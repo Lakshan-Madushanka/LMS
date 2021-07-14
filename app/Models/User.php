@@ -52,12 +52,14 @@ class User extends Authenticatable
 
     public function courses()
     {
-        return $this->belongsToMany(Course::class, 'user_id', 'course_id')
-            ->withPivot('course_in_charge');
+        return $this->belongsToMany(Course::class, 'user_course', 'user_id',
+            'course_id')
+            ->withPivot('course_in_charge')->withTimestamps();
     }
 
     public function subjects()
     {
-        return $this->belongsToMany(Subject::class, 'user_id', 'subject_id');
+        return $this->belongsToMany(Subject::class, 'user_subject', 'user_id',
+            'subject_id')->withTimestamps();
     }
 }

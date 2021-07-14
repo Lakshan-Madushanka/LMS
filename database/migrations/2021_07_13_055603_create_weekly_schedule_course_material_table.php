@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWeeklySheduleCourseMaterialTable extends Migration
+class CreateWeeklyScheduleCourseMaterialTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateWeeklySheduleCourseMaterialTable extends Migration
      */
     public function up()
     {
-        Schema::create('weekly_shedule_course_material', function (Blueprint $table) {
+        Schema::create('weekly_schedule_course_material', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('monthly_schedule_id')->constrained()
+            $table->foreignId('weekly_schedule_id')->constrained()
                 ->cascadeOnUpdate();
             $table->foreignId('course_material_id')->constrained()
                 ->cascadeOnUpdate();

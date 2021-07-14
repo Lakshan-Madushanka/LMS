@@ -22,8 +22,7 @@ class WeeklyScheduleFactory extends Factory
     public function definition()
     {
         return [
-            'month'      => $this->faker->numberBetween(1, 12),
-            'start_date' => $this->faker->dateTimeBetween('now', '3 months'),
+            'start_time' => $this->faker->dateTimeBetween('now', '3 months'),
             'payable'      => $this->faker->randomElement([true, false]),
             'status'      => $this->faker->randomElement(WeeklySchedule::status),
             'description' => $this->faker->paragraph(),

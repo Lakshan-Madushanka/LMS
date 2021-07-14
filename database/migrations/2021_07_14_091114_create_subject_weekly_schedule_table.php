@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVideoLessonsTable extends Migration
+class CreateSubjectWeeklyScheduleTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateVideoLessonsTable extends Migration
      */
     public function up()
     {
-        Schema::create('video_lessons', function (Blueprint $table) {
+        Schema::create('subject_weekly_schedule', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('weekly_schedule_id')->nullable()->constrained()
-                ->cascadeOnUpdate()->cascadeOnDelete();
-            $table->text('url');
+            $table->foreignId('subject_id')->constrained()->cascadeOnUpdate()
+                ->cascadeOnDelete();
+            $table->foreignId('weekly_schedule_id')->constrained()->cascadeOnUpdate()
+                ->cascadeOnDelete();
             $table->timestamps();
-
         });
     }
 
@@ -30,6 +30,6 @@ class CreateVideoLessonsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('video_lessons');
+        Schema::dropIfExists('subject_weekly_schedule');
     }
 }

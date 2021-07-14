@@ -26,7 +26,7 @@ class PaymentFactory extends Factory
             'payment_id' => Str::uuid(),
             'amount' => $this->faker->numberBetween(1000, 100000),
             'approval' => $this->faker->randomElement([true, false]),
-            'date' => $this->faker->dateTimeBetween(now, '4 months')
+            'date' => $this->faker->dateTimeBetween('now', '4 months')
 
         ];
     }

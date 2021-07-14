@@ -20,13 +20,15 @@ class CourseMaterial extends Model
     public function monthlySchedules()
     {
         return $this->belongsToMany(MonthlySchedule::class,
+            'course_monthly_schedule',
             'course_material_id',
             'monthly_schedule_id');
     }
 
     public function weeklySchedules()
     {
-        return $this->belongsToMany(WeeklySchedule::class, 'course_material_id',
-            'weekly_schedule_id');
+        return $this->belongsToMany(WeeklySchedule::class,
+            'weekly_schedule_course_material', 'course_material_id',
+            'weekly_schedule_id')->withTimestamps();
     }
 }

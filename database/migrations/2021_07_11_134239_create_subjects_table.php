@@ -18,7 +18,7 @@ class CreateSubjectsTable extends Migration
             $table->string('code', 10)->unique();
             $table->string('name', 25);
             $table->string('image', 50)->nullable();
-            $table->foreignId('monthly_schedule_id')->constrained()
+            $table->foreignId('monthly_schedule_id')->nullable()->constrained()
                 ->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });

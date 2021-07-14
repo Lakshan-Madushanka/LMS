@@ -13,4 +13,9 @@ class VideoLesson extends Model
     {
         return $this->hasOne(MonthlySchedule::class);
     }
+
+    public function weeklySchedule()
+    {
+        $this->belongsTo(WeeklySchedule::class);
+    }
 }

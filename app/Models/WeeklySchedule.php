@@ -16,19 +16,24 @@ class WeeklySchedule extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'w_s_id', 'u_id');
+        return $this->belongsToMany(User::class, 'user_weekly_schedule',
+            'w_s_id', 'u_id');
     }
 
     public function videoLesson()
     {
-        return $this->belongsTo(VideoLesson::class);
+        return $this->hasMany(VideoLesson::class);
     }
 
     public function courseMaterials()
     {
-        return $this->belongsToMany(CourseMaterial::class, 'weekly_schedule_id',
-            'course_material_id');
+        return $this->belongsToMany(CourseMaterial::class,
+            'weekly_schedule_course_material', 'weekly_schedule_id',
+            'course_material_id')->withTimestamps();
     }
 
-
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class)->withTimestamps();
+    }
 }
