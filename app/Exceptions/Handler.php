@@ -9,6 +9,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -96,6 +97,10 @@ class Handler extends ExceptionHandler
                 null, $exception->getCode());
         });
 
+        if (config('app.debug')) {
+            return parent::render();
+        }
+
         $this->renderable(function (
             QueryException $exception,
             $request
@@ -146,11 +151,10 @@ class Handler extends ExceptionHandler
         AuthorizationException $e
     ) {
         if (!$this->isFrontEnd($request)) {
-            return $this->showError($e->getMessage(), 'Invalid Login', null,
+            return $this->showError($e->getMessage(), 'Access Denied', null,
                 $e->getCode());
         } else {
-            return redirect()->guest('login');
-        }
+            new AccessDeniedHttpException($e->getMessage(), $e);        }
     }
 
     public function convertValidationExceptionToResponse(
