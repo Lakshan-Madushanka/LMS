@@ -2,22 +2,25 @@
 
 namespace App\Exceptions;
 
+use App\Traits\ApiResponser;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Routing\Exception\MethodNotAllowedException;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use App\Traits\ApiResponser;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
     use ApiResponser;
+
     /**
      * A list of the exception types that are not reported.
      *
@@ -35,7 +38,6 @@ class Handler extends ExceptionHandler
      */
     protected $dontFlash
         = [
-            'current_password',
             'password',
             'password_confirmation',
         ];
@@ -45,6 +47,8 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
+
+
     public function register()
     {
         $this->renderable(function (
@@ -58,8 +62,9 @@ class Handler extends ExceptionHandler
         $this->renderable(function (
             AuthenticationException $exception,
             $request
+
         ) {
-            return $this->unAuthenticated($exception, $request);
+            return $this->unAuthenticated($request, $exception);
         });
 
         $this->renderable(function (
@@ -70,11 +75,10 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (
-            RouteNotFoundException $exception,
+            AccessDeniedHttpException $exception,
             $request
         ) {
-            return $this->showError($exception->getMessage(), 'Invalid URL',
-                null, $exception->getCode());
+            return $this->accessDenied($exception, $request);
         });
 
         $this->renderable(function (
@@ -85,50 +89,74 @@ class Handler extends ExceptionHandler
             return $this->showError(
                 $exception->getMessage(),
                 "Requested $model doesn't exist",
-                null, $exception->getCode()
+                null, $exception->status
             );
         });
 
         $this->renderable(function (
-            MethodNotAllowedException $exception,
+            NotFoundHttpException $exception,
             $request
         ) {
-            return $this->showError($exception->getMessage(), 'Invalid URL',
-                null, $exception->getCode());
+            return $this->showError('URL Error', 'Invalid URL',
+                null, 404);
         });
 
-        if (config('app.debug')) {
-            return parent::render();
-        }
-
         $this->renderable(function (
-            QueryException $exception,
+            MethodNotAllowedHttpException $exception,
             $request
         ) {
-            $errorCode = $exception->errorInfo[1];
-            if ($errorCode == 1451) {
+            return $this->showError('Method Error',
+                'Method doesn\'t support for this url',
+                null, 405);
+        });
+
+        if (!config('app.debug')) {
+
+            $this->renderable(function (
+                QueryException $exception,
+                $request
+            ) {
+                $errorCode = $exception->errorInfo[1];
+                if ($errorCode == 1451) {
+                    return $this->showError('Foreign key violation',
+                        'Operation cannot proceed [Record is associated with other records',
+                        null, Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+            });
+
+            $this->renderable(function (
+                HttpException $exception,
+                $request
+            ) {
                 return $this->showError($exception->getMessage(),
-                    'Operation cannot proceed [Record is associated with other records',
-                    null, $exception->getCode());
-            }
-        });
+                    'Error',
+                    'General Error',
+                    null, $exception->getStatusCode());
 
-        $this->renderable(function (
-            HttpException $exception,
-            $request
-        ) {
-            return $this->showError($exception->getMessage(),
-                'General Error',
-                null, $exception->getCode());
+            });
 
-        });
 
-        return $this->showError('Error',
-            'Something went wrong, please try again later',
-            null, 500);
+        }
+        return $this->registerCustomMethods();
     }
 
     //end of register
+
+    public function convertValidationExceptionToResponse(
+        ValidationException $e,
+        $request
+    ) {
+        $errors = $e->errors();
+        if ($this->isFrontEnd($request)) {
+            $request->ajax()
+                ? response()->json(['messages' => $errors], $e->status)
+                :
+                redirect()->back()->withInput(Arr::except($request->input(),
+                    $this->dontFlash)->withErrors());
+        }
+        return $this->showError($e->getMessage(), 'Validation Error', $errors,
+            $e->status);
+    }
 
     public function isFrontEnd(Request $request)
     {
@@ -139,37 +167,55 @@ class Handler extends ExceptionHandler
     public function unAuthenticated(
         $request,
         AuthenticationException $e
+
     ) {
         if (!$this->isFrontEnd($request)) {
-            return $this->showError($e->getMessage(), 'Invalid Login', null,
-                $e->getCode());
+            return $this->showError($e->getMessage(),
+                'Login required to do the operation', null,
+                Response::HTTP_UNAUTHORIZED);
+        }
+        return redirect()->guest($e->redirectTo() ?? route('login'));
+    }
+
+
+    //laravel 8 autorization exception for authorization
+    public function accessDenied(
+        AccessDeniedHttpException $e,
+        $request
+    ) {
+
+        if (!$this->isFrontEnd($request)) {
+            return $this->showError($e->getMessage(),
+                'You dont have neccessity authorization access', null,
+                Response::HTTP_FORBIDDEN);
+        } else {
+            new AccessDeniedHttpException($e->getMessage(), $e);
         }
     }
 
     public function unAuthorized(
-        $request,
-        AuthorizationException $e
-    ) {
-        if (!$this->isFrontEnd($request)) {
-            return $this->showError($e->getMessage(), 'Access Denied', null,
-                $e->getCode());
-        } else {
-            new AccessDeniedHttpException($e->getMessage(), $e);        }
-    }
-
-    public function convertValidationExceptionToResponse(
-        ValidationException $e,
+        AuthorizationException $e,
         $request
     ) {
-        $errors = $e->errors();
-        if ($this->isFrontEnd()) {
-            $request->ajax()
-                ? response()->json(['messages' => $errors], $e->getCode())
-                :
-                redirect()->back()->withInput()->withErrors();
-        }
 
-        return $this->showError($e->getMessage(), 'Validation Error', $errors,
-            $e->getCode());
+        if (!$this->isFrontEnd($request)) {
+            return $this->showError($e->getMessage(), 'Access Denied', null,
+                Response::HTTP_FORBIDDEN);
+        } else {
+            new AccessDeniedHttpException($e->getMessage(), $e);
+        }
+    }
+
+    public function registerCustomMethods()
+    {
+        $this->renderable(function (
+            StudentModelNotFoundException $e,
+            $request
+        ) {
+            $modelID = $e->getModelId();
+            return $this->showError('Error',
+                $e->getDefaultMessage(), null,
+                Response::HTTP_NOT_FOUND);
+        });
     }
 }

@@ -16,8 +16,8 @@ class Course extends Model
 
     public function users()
     {
-        return $this->belongsToMany(Role::class, 'user_course', 'course_id',
-            'user_id')
+        return $this->belongsToMany(User::class, 'user_course', 'user_id','course_id'
+            )
             ->withPivot('course_in_charge')->withTimestamps();
     }
 

@@ -20,7 +20,9 @@ use Tests\TestCase;
 
 class DatabaseSchemaTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
+
+    //protected $seed = true;
 
     /**
      * A basic feature test example.
@@ -37,17 +39,16 @@ class DatabaseSchemaTest extends TestCase
     public function test_database_schema_is_created_successfully()
     {
         // DB::statement("SHOW TABLES");
-
     }
 
-    /* public function test_subjects_can_be_created()
+     public function test_subjects_can_be_created()
      {
+         $this->seed(MonthlyScheduleSeeder::class);
          $this->seed(UserSeeder::class);
          $this->assertDatabaseCount('users', 4);
+     }
 
-     }*/
-
-    public function test_users_can_be_created_and_assign_roles_and_subjects()
+     public function test_users_can_be_created_and_assign_roles_and_subjects()
     {
         $this->seed(MonthlyScheduleSeeder::class);
         $this->seed(UserSeeder::class);
@@ -108,5 +109,10 @@ class DatabaseSchemaTest extends TestCase
         $this->assertDatabaseCount('video_lessons', 10);
         $this->assertDatabaseCount('weekly_schedules', 10);
         $this->assertDatabaseCount('course_materials', 22);
+    }
+
+    public function test_all_seeds_can_run()
+    {
+        $this->seed();
     }
 }

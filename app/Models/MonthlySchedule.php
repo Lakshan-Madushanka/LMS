@@ -23,6 +23,7 @@ class MonthlySchedule extends Model
     {
         return $this->belongsToMany(CourseMaterial::class,
             'monthly_schedule_course_material', 'monthly_schedule_id',
-            'course_material_id')->withTimestamps();
+            'course_material_id'
+        )->withTimestamps();
     }
 }

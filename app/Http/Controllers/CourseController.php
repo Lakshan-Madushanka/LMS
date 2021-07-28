@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\V1\ApiController;
 use App\Models\course;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class CourseController extends Controller
+class CourseController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +17,11 @@ class CourseController extends Controller
      */
     public function index()
     {
-        //
+        $user = User::find(1);
+      // $user->roles()->attach([4]);
+
+        return $this->showAll('Ok', 'Query Successed',
+            $user->roles,Response::HTTP_OK);
     }
 
     /**

@@ -11,9 +11,10 @@ class Subject extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_subject', 'subject_id',
-            'user_id'
-            )
+        return $this->belongsToMany(User::class, 'user_subject',
+            'subject_id','user_id'
+
+        )
             ->withPivot('subject_in_charge')
             ->withTimestamps();
     }

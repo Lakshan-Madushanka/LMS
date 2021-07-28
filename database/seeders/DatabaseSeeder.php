@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\VideoLesson;
 use App\Models\WeeklySchedule;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
@@ -23,8 +24,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->disableForeignKeyCheck();
-        $this->truncateTables();
+       // $this->disableForeignKeyCheck();
+        $this->deleteTables();
         $this->disableEventListners();
 
        $this->call([
@@ -47,26 +48,28 @@ class DatabaseSeeder extends Seeder
         }
     }
 
-    public function truncateTables()
+    public function deleteTables()
     {
-        User::truncate();
-        Role::truncate();
-        Course::truncate();
-        Subject::truncate();
-        MonthlySchedule::truncate();
-        WeeklySchedule::truncate();
-        Payment::truncate();
-        VideoLesson::truncate();
-        CourseMaterial::truncate();
+        /*DB::table('users')->delete();
+        DB::table('roles')->delete();
+        DB::table('courses')->delete();
+        DB::table('subjects')->delete();
+        DB::table('monthly_schedules')->delete();
+        DB::table('weekly_schedules')->delete();
+        DB::table('payments')->delete();
+        DB::table('video_lessons')->delete();
+        DB::table('course_materials')->delete();
 
-        DB::table('user_role')->truncate();
-        DB::table('user_course')->truncate();
-        DB::table('course_subject')->truncate();
-        DB::table('user_subject')->truncate();
-        DB::table('subject_weekly_schedule')->truncate();
-        DB::table('user_weekly_schedule')->truncate();
-        DB::table('weekly_schedule_course_material')->truncate();
-        DB::table('monthlyly_schedule_course_material')->truncate();
+        DB::table('user_role')->delete();
+        DB::table('user_course')->delete();
+        DB::table('course_subject')->delete();
+        DB::table('user_subject')->delete();
+        DB::table('subject_weekly_schedule')->delete();
+        DB::table('user_weekly_schedule')->delete();
+        DB::table('weekly_schedule_course_material')->delete();
+        DB::table('monthly_schedule_course_material')->delete();*/
+        Artisan::call('db:wipe');
+        Artisan::call('migrate');
 
     }
 

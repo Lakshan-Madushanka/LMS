@@ -27,10 +27,17 @@ class UserSeeder extends Seeder
             ->has(Role::factory()->sequence(
                 function ($sequence) {
                     return ['name' => Role::roles[$sequence->index]];
-                 }
-                )
+                }
+            )
             )
             ->has(Subject::factory()->count(3))
             ->create();
+
+        User::factory()->count(20)->create()->each(function ($user, $index) {
+            $user->roles()->attach(array_search(Role::roles[$index
+                % count(Role::roles)], Role::roles) + 1);
+        });
+
     }
+
 }

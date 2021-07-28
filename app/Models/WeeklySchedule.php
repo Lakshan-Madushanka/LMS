@@ -17,7 +17,7 @@ class WeeklySchedule extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_weekly_schedule',
-            'w_s_id', 'u_id');
+            'w_s_id', 'u_id', );
     }
 
     public function videoLesson()
@@ -28,8 +28,9 @@ class WeeklySchedule extends Model
     public function courseMaterials()
     {
         return $this->belongsToMany(CourseMaterial::class,
-            'weekly_schedule_course_material', 'weekly_schedule_id',
-            'course_material_id')->withTimestamps();
+            'weekly_schedule_course_material',
+            'weekly_schedule_id','course_material_id',
+        )->withTimestamps();
     }
 
     public function subjects()

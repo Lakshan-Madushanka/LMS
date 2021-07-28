@@ -2,7 +2,14 @@
 
 namespace App\Providers;
 
+use App\Exceptions\StudentModelNotFoundException;
+use App\Models\Student;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Route::model('student', Student::class, function ($student) {
+            throw new StudentModelNotFoundException($student);
+        });
     }
 }

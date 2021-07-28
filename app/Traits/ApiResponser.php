@@ -12,7 +12,7 @@ trait ApiResponser
         $data,
         $code = 200
     ) {
-        $this->successResponce($status, $statusMsg, $data, $code);
+        return $this->successResponce($status, $statusMsg, $data, $code);
     }
 
     public function showAll(
@@ -21,11 +21,17 @@ trait ApiResponser
         $data,
         $code = 200
     ) {
-        if($data instanceof Illuminate\Support\Collection)
+        if(empty($data)) {
+            return $this->successResponce($status, $statusMsg, $data, $code);
+        }
+        if(!$data instanceof Illuminate\Support\Collection)
         {
             $data = collect($data);
+            if($data->isEmpty()) {
+                return $this->successResponce($status, $statusMsg, $data, $code);
+            }
         }
-        $this->successResponce($status, $statusMsg, $data, $code);
+        return $this->successResponce($status, $statusMsg, $data, $code);
     }
 
     public function showError(
