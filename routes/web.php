@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\V1\Student\StudentController;
+use App\Http\Controllers\v1\Student\StudentController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 

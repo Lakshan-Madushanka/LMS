@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\V1\ApiController;
+use App\Http\Controllers\v1\ApiController;
 use App\Models\course;
 use App\Models\User;
 use Illuminate\Http\Request;

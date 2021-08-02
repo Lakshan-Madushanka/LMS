@@ -1,8 +1,8 @@
 <?php
 
 use App\Exceptions\StudentModelNotFoundException;
-use App\Http\Controllers\V1\Student\StudentController;
-use App\Http\Controllers\V1\User\UserController;
+use App\Http\Controllers\v1\Student\StudentController;
+use App\Http\Controllers\v1\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
