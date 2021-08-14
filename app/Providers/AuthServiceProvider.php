@@ -35,9 +35,9 @@ class AuthServiceProvider extends ServiceProvider
         $this->defineGates();
 
         // passport services
-        Passport::routes();
-        Passport::hashClientSecrets();
-        Passport::tokensExpireIn(now()->addDays(15));
+        Passport::routes(null, ['prefix' => 'api/v1/oauth']);
+        //Passport::hashClientSecrets();
+        Passport::tokensExpireIn(now()->addDays(1500));
         Passport::refreshTokensExpireIn(now()->addDays(30));
         Passport::personalAccessTokensExpireIn(now()->addMonths(6));
 

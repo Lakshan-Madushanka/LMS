@@ -51,6 +51,7 @@ class Handler extends ExceptionHandler
 
     public function register()
     {
+
         $this->renderable(function (
             ValidationException $exception,
             $request
@@ -89,7 +90,7 @@ class Handler extends ExceptionHandler
             return $this->showError(
                 $exception->getMessage(),
                 "Requested $model doesn't exist",
-                null, $exception->status
+                null, $exception->getStatusCode()
             );
         });
 
@@ -130,11 +131,10 @@ class Handler extends ExceptionHandler
             ) {
                 return $this->showError($exception->getMessage(),
                     'Error',
-                    'General Error',
+                    'Something went wrong',
                     null, $exception->getStatusCode());
 
             });
-
 
         }
         return $this->registerCustomMethods();

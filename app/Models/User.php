@@ -33,7 +33,7 @@ class User extends Authenticatable
             'contact_no',
             'email',
             'description',
-            'image'
+            'image',
         ];
 
     /**
@@ -57,6 +57,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
         ];
 
+    //check roles
     public static function isLecturer(User $user)
     {
         return in_array(3, $user->roles->pluck('id')->toArray());
@@ -64,7 +65,7 @@ class User extends Authenticatable
 
     public function isAdministrative(User $user)
     {
-        return count(array_intersect([1,2],
+        return count(array_intersect([1, 2],
                 $user->roles->pluck('id')->toArray())) > 0;
     }
 
@@ -97,7 +98,7 @@ class User extends Authenticatable
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'user_subject',
-             'user_id','subject_id'
+            'user_id', 'subject_id'
         )->withTimestamps();
     }
 }

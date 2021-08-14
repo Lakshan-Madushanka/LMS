@@ -41,13 +41,6 @@ trait ApiResponser
         $code = 404
     )
     {
-        return response()->json(
-            [
-                'status'         => $status,
-                'status_massage' => $statusMsg,
-                'data'           => $data
-            ],
-            $code
-        );
+        return $this->errorResponce($status, $statusMsg, $data, $code);
     }
 }
