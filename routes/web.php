@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\v1\Auth\GoogleLoginController;
 use App\Http\Controllers\v1\Student\StudentController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
@@ -19,3 +20,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//auth routes
+Route::get('/google/oauth',
+    [GoogleLoginController::class, 'redirect'])->name('googleLoginRedirect');
+
+Route::get('/google/oauth/callback',
+    [GoogleLoginController::class, 'register'])->name('googleLoginCallback');

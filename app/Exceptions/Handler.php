@@ -8,6 +8,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
@@ -87,6 +88,7 @@ class Handler extends ExceptionHandler
             $request
         ) {
             $model = strtolower(class_basename($exception->getModel()));
+
             return $this->showError(
                 $exception->getMessage(),
                 "Requested $model doesn't exist",
@@ -95,20 +97,20 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (
-            NotFoundHttpException $exception,
-            $request
-        ) {
-            return $this->showError('URL Error', 'Invalid URL',
-                null, 404);
-        });
-
-        $this->renderable(function (
             MethodNotAllowedHttpException $exception,
             $request
         ) {
-            return $this->showError('Method Error',
-                'Method doesn\'t support for this url',
-                null, 405);
+            return $this->showError(Response::$statusTexts[Response::HTTP_METHOD_NOT_ALLOWED],
+                $exception->getMessage(),
+                null, Response::HTTP_METHOD_NOT_ALLOWED);
+        });
+
+        $this->renderable(function (
+            ThrottleRequestsException $exception
+        ) {
+            return $this->showError(Response::$statusTexts[Response::HTTP_TOO_MANY_REQUESTS],
+                $exception->getMessage(),
+                null, Response::HTTP_TOO_MANY_REQUESTS);
         });
 
         if (!config('app.debug')) {
@@ -120,7 +122,7 @@ class Handler extends ExceptionHandler
                 $errorCode = $exception->errorInfo[1];
                 if ($errorCode == 1451) {
                     return $this->showError('Foreign key violation',
-                        'Operation cannot proceed [Record is associated with other records',
+                        'Operation cannot proceed [Record is associated with other records]',
                         null, Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
             });
@@ -129,15 +131,25 @@ class Handler extends ExceptionHandler
                 HttpException $exception,
                 $request
             ) {
-                return $this->showError($exception->getMessage(),
-                    'Error',
-                    'Something went wrong',
-                    null, $exception->getStatusCode());
+                return $this->showError('Error',
+                    $exception->getMessage(),
+                    null,
+                    $exception->getStatusCode());
 
             });
 
         }
-        return $this->registerCustomMethods();
+        // register custom exceptions
+        $this->registerCustomMethods();
+
+        $this->renderable(function (
+            NotFoundHttpException $exception,
+            $request
+        ) {
+            return $this->showError('Not Found',
+                $exception->getMessage() ? $exception->getMessage() : 'Invalid route',
+                null, $exception->getStatusCode());
+        });
     }
 
     //end of register
@@ -154,6 +166,7 @@ class Handler extends ExceptionHandler
                 redirect()->back()->withInput(Arr::except($request->input(),
                     $this->dontFlash)->withErrors());
         }
+
         return $this->showError($e->getMessage(), 'Validation Error', $errors,
             $e->status);
     }
@@ -174,6 +187,7 @@ class Handler extends ExceptionHandler
                 'Login required to do the operation', null,
                 Response::HTTP_UNAUTHORIZED);
         }
+
         return redirect()->guest($e->redirectTo() ?? route('login'));
     }
 
@@ -213,6 +227,17 @@ class Handler extends ExceptionHandler
             $request
         ) {
             $modelID = $e->getModelId();
+
+            return $this->showError('Error',
+                $e->getDefaultMessage(), null,
+                Response::HTTP_NOT_FOUND);
+        });
+        $this->renderable(function (
+            UserModelNotFoundException $e,
+            $request
+        ) {
+            $modelID = $e->getModelId();
+
             return $this->showError('Error',
                 $e->getDefaultMessage(), null,
                 Response::HTTP_NOT_FOUND);

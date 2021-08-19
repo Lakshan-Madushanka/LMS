@@ -6,9 +6,10 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, HasApiTokens;
 
@@ -58,15 +59,20 @@ class User extends Authenticatable
         ];
 
     //check roles
-    public static function isLecturer(User $user)
+    public static function isSuperAdmin(User $user)
     {
-        return in_array(3, $user->roles->pluck('id')->toArray());
+        return in_array(1, $user->roles->pluck('id')->toArray());
     }
 
-    public function isAdministrative(User $user)
+    public static function isAdministrative(User $user)
     {
         return count(array_intersect([1, 2],
                 $user->roles->pluck('id')->toArray())) > 0;
+    }
+
+    public static function isLecturer(User $user)
+    {
+        return in_array(3, $user->roles->pluck('id')->toArray());
     }
 
     public function isStudent(User $user)

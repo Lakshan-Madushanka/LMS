@@ -24,8 +24,7 @@ class StudentPolicy
      */
     public function viewAny(User $user)
     {
-        echo 'here';
-        dd();
+
         return User::checkRoles($user, [1, 2, 3]) || $user->id === $user->id;
     }
 
@@ -40,7 +39,7 @@ class StudentPolicy
     public function view(User $user, Student $student)
     {
 
-        return User::checkRoles($user, [1, 2, 3]) || $user->id === $student->id;
+        return User::isAdministrative($user) or $user->id === $student->id;
     }
 
     /**

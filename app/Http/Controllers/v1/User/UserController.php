@@ -11,11 +11,15 @@ use App\Http\utills\Paths;
 use App\Models\Role;
 use App\Models\Student;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -36,6 +40,7 @@ class UserController extends ApiController
      */
     public function index()
     {
+
     }
 
     /**
@@ -45,50 +50,37 @@ class UserController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(UserCreateRequest $request)
     {
-
         $data = $request->input();
-
-        $lastInsertedRecord = User::all()
-            ->sortByDesc('id')
-            ->values()
-            ->first();
-
-        $lastInsertedId = $lastInsertedRecord->id;
 
         //set password
         if ($request->filled('password')) {
             $data['password'] = Hash::make($data['password']);
         }
         //set user_id
-        $data['user_id'] = Str::random(4).'_'.$lastInsertedId;
+        $data['user_id'] = $this->generateUserId();
 
         //store user image
-        if ($this->checkRequestHasFile($request)) {
-            // set image name
-            $imageId = $lastInsertedId + 1;//set image id to current id
-            $originaleImageName = preg_replace('![^a-z0-9]+!i', '-',
-                $request->file('image')->getClientOriginalName());
-
-            $imageExtesion = $request->file('image')
-                ->getClientOriginalExtension();
-            $fileName = pathinfo($originaleImageName, PATHINFO_FILENAME);
-            $imageName = "{$fileName}-{$imageId}.{$imageExtesion}";
+        if ($this->checkRequestHasFile($request, 'image')) {
+            $imageName = $this->setUploadedUserImageName($request);
 
             //store image
             $image = $request->file('image')
                 ->storeAs('/img/users', $imageName, 'public');
 
             $data['image'] = asset('storage/'.$image); // set db image column
-
         }
-
-        $this->addEmailVerifiedColumn($request, $data);
 
         $user = Student::create($data);
 
         $this->addRoles($request, $user);
+
+        if(User::isAdministrative($request->user())) {
+            $this->addEmailVerifiedColumn($request, $data);
+        }else{
+            event(new Registered($user));
+        }
 
         return $this->showOne('Created', 'Record created', null,
             Response::HTTP_CREATED);
@@ -103,7 +95,7 @@ class UserController extends ApiController
      */
     public function show(User $user)
     {
-        //
+
     }
 
     /**
@@ -116,13 +108,20 @@ class UserController extends ApiController
      */
     public function update(UserUpdateRequest $request, User $user)
     {
-        if ($this->checkRequestHasFile($request)) {
+
+        if ($request->user()->cannot('update',
+                $user) and !User::isAdministrative($user)) {
+
+            throw new AuthorizationException();
+        }
+
+        if ($this->checkRequestHasFile($request, 'image')) {
             Storage::disk('public')
                 ->delete(str_replace(Paths::getPublicStoragePath(), '',
                     $user->image));
         }
 
-        $user->fill($request->except('image'));
+        $user->fill($request->except('image', 'email', 'email_verified_at'));
 
         $this->addEmailVerifiedColumn($request, $user);
 
@@ -151,10 +150,15 @@ class UserController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user, Request $request)
+    public function destroy(User $user)
     {
+        $user->delete();
 
+        return $this->showOne(Response::$statusTexts[Response::HTTP_ACCEPTED],
+            'User record deleted',
+            null, Response::HTTP_ACCEPTED);
     }
+
 
     public function isContainRoles(Request $request)
     {
@@ -172,23 +176,37 @@ class UserController extends ApiController
 
     public function addRoles(Request $request, User $user)
     {
-            if (Gate::allows('isAdmin')) {
-                $user->roles()->syncWithoutDetaching($request->roles);
-            } elseif (User::isLecturer($user)) {
-                $user->roles()->sync([3]);
-            } else {
-                $user->roles()->sync([4]);
-            }
-    }
 
-    public function checkRequestHasFile(Request $request)
-    {
-        if ($request->hasFile('image')) {
-            if (!$request->file('image')->isValid()) {
-                throw ValidationException::withMessages(['massage' => 'Invalid file contents']);
+        if (is_array($request->roles)) {
+            if (count(array_intersect([1, 2], $request->roles))) {
+                throw_unless(User::isSuperAdmin($request->user()),
+                    new AuthorizationException());
+                $user->roles()->sync($request->roles);
             }
-
-            return true;
+        } elseif (Gate::allows('isAdmin')) {
+            $user->roles()->sync($request->roles);
+        } elseif (User::isLecturer($user)) {
+            $this->authorize('update');
+            $user->roles()->sync([3]);
+        } else {
+            $user->roles()->sync([4]);
         }
     }
+
+    public function setUploadedUserImageName(Request $request)
+    {
+        $lastInsertedId = $this->lastInsertedUserId();
+
+        $imageId = $lastInsertedId + 1;//set image id to current id
+        $originaleImageName = preg_replace('![^a-z0-9]+!i', '-',
+            $request->file('image')->getClientOriginalName());
+
+        $imageExtesion = $request->file('image')
+            ->getClientOriginalExtension();
+        $fileName = pathinfo($originaleImageName, PATHINFO_FILENAME);
+        $imageName = "{$fileName}-{$imageId}.{$imageExtesion}";
+
+        return $imageName;
+    }
+
 }

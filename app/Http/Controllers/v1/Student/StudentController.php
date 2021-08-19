@@ -22,8 +22,7 @@ class StudentController extends ApiController
 {
     public function __construct()
     {
-        parent::__construct();
-        $this->middleware('auth:api')->except('store');
+        //$this->middleware('auth:api')->except('store');
        // $this->authorizeResource(Student::class, 'student');
     }
 
@@ -34,9 +33,9 @@ class StudentController extends ApiController
      */
     public function index()
     {
-        Gate::authorize('isManagement');
+        //Gate::authorize('isManagement');
         $students = Student::lazy();
-        return $this->showAll('Ok', 'Query Successed', $students,
+        return $this->showAll('Ok', 'Query Successed !', $students,
             Response::HTTP_OK);
     }
 

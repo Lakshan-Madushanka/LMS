@@ -9,35 +9,35 @@ use Symfony\Component\HttpFoundation\Response;
 trait ApiResponseSystem
 {
     public function successResponce(
-        $status,
-        $statusMsg,
         $data,
-        int $code = 200
+        int $code = 200,
+        $status = 'ok',
+        $statusMsg = 'Query successed !'
     ) {
         $responseData = [
             'status' => $status,
             'status_message' => $statusMsg,
         ];
 
-       if( $data) {
-           $responseData['data'] = $data;
-       }
+        if ($data) {
+            $responseData['data'] = $data;
+        }
 
         return response()->json($responseData, $code);
     }
 
     public function errorResponce(
-        $status,
-        $statusMsg,
         $data,
-        int $code = 404
+        int $code = 500,
+        $status = 'Error',
+        $statusMsg = 'Error occured'
     ) {
         $responseData = [
             'status' => $status,
             'status_message' => $statusMsg,
         ];
 
-        if( $data) {
+        if ($data) {
             $responseData['data'] = $data;
         }
 

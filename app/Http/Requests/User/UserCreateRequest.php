@@ -48,7 +48,7 @@ class UserCreateRequest extends FormRequest
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => [
                 'confirmed',
-                Password::min(6)->letters()->mixedCase()->numbers()->symbols()
+                Password::defaults()
             ],
             'image' => [
                 'image', 'between:0,3024', new UploadedFileLengthValidate()
