@@ -22,7 +22,7 @@ class StudentController extends ApiController
 {
     public function __construct()
     {
-        //$this->middleware('auth:api')->except('store');
+        $this->middleware('auth:api')->except('store');
        // $this->authorizeResource(Student::class, 'student');
     }
 

@@ -181,12 +181,14 @@ class UserController extends ApiController
             if (count(array_intersect([1, 2], $request->roles))) {
                 throw_unless(User::isSuperAdmin($request->user()),
                     new AuthorizationException());
+					
                 $user->roles()->sync($request->roles);
             }
         } elseif (Gate::allows('isAdmin')) {
             $user->roles()->sync($request->roles);
         } elseif (User::isLecturer($user)) {
             $this->authorize('update');
+			
             $user->roles()->sync([3]);
         } else {
             $user->roles()->sync([4]);
@@ -198,11 +200,14 @@ class UserController extends ApiController
         $lastInsertedId = $this->lastInsertedUserId();
 
         $imageId = $lastInsertedId + 1;//set image id to current id
+		
+		// convert filenames to valid url format
         $originaleImageName = preg_replace('![^a-z0-9]+!i', '-',
             $request->file('image')->getClientOriginalName());
 
         $imageExtesion = $request->file('image')
             ->getClientOriginalExtension();
+			
         $fileName = pathinfo($originaleImageName, PATHINFO_FILENAME);
         $imageName = "{$fileName}-{$imageId}.{$imageExtesion}";
 
