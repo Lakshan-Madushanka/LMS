@@ -2,16 +2,20 @@
 
 namespace App\Models;
 
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Laravel\Cashier\Billable;
 use Laravel\Passport\HasApiTokens;
+use Laravel\Scout\Searchable;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, Billable, SoftDeletes, Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -46,6 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail
         = [
             'password',
             'remember_token',
+            'deleted_at'
         ];
 
     /**
@@ -57,6 +62,35 @@ class User extends Authenticatable implements MustVerifyEmail
         = [
             'email_verified_at' => 'datetime',
         ];
+
+   // protected $cascadeDeletes = ['roles'];
+
+    //setters
+    public function setFullNameAttribute($value)
+    {
+        $this->attributes['full_name'] = ucwords(strtolower($value));
+    }
+
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = strtolower($value);
+    }
+
+
+    public function setAddressAttribute($value)
+    {
+        $this->attributes['address'] = ucwords(strtolower($value));
+    }
+
+    public function setNearestTownAttribute($value)
+    {
+        $this->attributes['nearest_town'] = ucwords(strtolower($value));
+    }
+
+    public function setGenderAttribute($value)
+    {
+        $this->attributes['gender'] = ucfirst($value);
+    }
 
     //check roles
     public static function isSuperAdmin(User $user)
@@ -75,7 +109,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return in_array(3, $user->roles->pluck('id')->toArray());
     }
 
-    public function isStudent(User $user)
+    public static function isStudent(User $user)
     {
         return in_array(4, $user->roles->pluck('id')->toArray());
     }

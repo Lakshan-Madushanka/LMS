@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\v1\Auth\GoogleLoginController;
-use App\Http\Controllers\v1\Student\StudentController;
+use App\Http\Controllers\V1\Auth\GoogleLoginController;
+use App\Http\Controllers\V1\Student\StudentController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
@@ -17,6 +17,11 @@ use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 */
 
 Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
+
+Route::get('home', function () {
     return view('welcome');
 });
 

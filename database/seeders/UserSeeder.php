@@ -34,8 +34,9 @@ class UserSeeder extends Seeder
             ->create();
 
         User::factory()->count(20)->create()->each(function ($user, $index) {
-            $user->roles()->attach(array_search(Role::roles[$index
-                % count(Role::roles)], Role::roles) + 1);
+            /* $user->roles()->attach(array_search(Role::roles[$index
+                 % count(Role::roles)], Role::roles) + 1);*/
+            $user->roles()->attach(Role::names[$index % count(Role::names)]);
         });
 
     }

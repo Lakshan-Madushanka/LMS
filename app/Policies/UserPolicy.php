@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
@@ -65,7 +66,10 @@ class UserPolicy
      */
     public function delete(User $user, User $model)
     {
-        //
+        if(User::isSuperAdmin($model)) {
+            return Response::deny(__('messages.cannotExecute'));
+        }
+        return $user->id === $model->id or User::isAdministrative($user);
     }
 
     /**

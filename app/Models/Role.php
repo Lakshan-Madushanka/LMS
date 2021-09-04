@@ -9,18 +9,18 @@ class Role extends Model
 {
     use HasFactory;
 
-    const roles
+    const names
         = [
-            'super_admin',
-            'admin',
-            'lecturer',
-            'student'
+            'super_admin' => 1,
+            'admin'       => 2,
+            'lecturer'    => 3,
+            'student'     => 4,
         ];
 
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_role'
-            , 'role_id', 'user_id', )
+            , 'role_id', 'user_id',)
             ->withTimestamps();
     }
 }

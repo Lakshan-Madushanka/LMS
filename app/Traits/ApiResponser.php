@@ -79,7 +79,7 @@ trait ApiResponser
     public function filterCollection($collection)
     {
         $filterColumn = request()->query('filterColumn');
-        $filterValue = request()->query('filterValue');
+        $filterValue  = request()->query('filterValue');
 
         if (!empty($filterColumn) or !empty($filterValue)) {
             $collection = $collection->where($filterColumn, $filterValue);
@@ -92,32 +92,32 @@ trait ApiResponser
 
     public function paginateCollection($collection)
     {
-        if (\request()->query('paginate') !== 'true' or empty(\request()->query('page'))) {
+        if (\request()->query('paginate') !== 'true') {
             return $collection;
         }
         request()->validate([
             'perPage' => ['integer', 'min:5'],
-            'page' => ['integer', 'min:1'],
+            'page'    => ['integer', 'min:1'],
         ]);
         $requestedPerPage = \request()->has('perPage');
 
         $perPage = $requestedPerPage ? \request()->query('perPage') : 10;
 
+        $requestedPage = request()->query('page');
         //$currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentPage = \request()->query('page');
+        $currentPage = $requestedPage ? $requestedPage : 1;
 
         $results = $collection->slice($perPage * ($currentPage - 1),
             $perPage)->values();
 
         $paginatedData = [
-            'current_page' => $currentPage,
-            'num_of_pages' => ceil($collection->count() / $perPage),
+            'current_page'   => $currentPage,
+            'num_of_pages'   => ceil($collection->count() / $perPage),
             'num_of_resutls' => $collection->count(),
         ];
 
         $paginated = collect(['details' => $results, 'meta' => $paginatedData]);
 
-        // $paginated = $collectionpush(['meta' => $paginatedData]);
         /* $paginated = new LengthAwarePaginator($results, $collection->count(), $perPage, $currentPage, [
              'path' => LengthAwarePaginator::resolveCurrentPath()
          ]);

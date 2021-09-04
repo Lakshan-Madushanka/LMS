@@ -22,6 +22,7 @@ class CreatePaymentsTable extends Migration
             $table->boolean('approval')->default(false);
             $table->timestamp('date')->useCurrent()->useCurrentOnUpdate();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

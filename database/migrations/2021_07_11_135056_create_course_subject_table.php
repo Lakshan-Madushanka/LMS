@@ -19,6 +19,7 @@ class CreateCourseSubjectTable extends Migration
             $table->foreignId('subject_id')->constrained()->cascadeOnUpdate();
             $table->boolean('course_in_charge')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

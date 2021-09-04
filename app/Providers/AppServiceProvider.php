@@ -6,6 +6,11 @@ use App\Exceptions\StudentModelNotFoundException;
 use App\Exceptions\UserModelNotFoundException;
 use App\Models\Student;
 use App\Models\User;
+use App\Repository\Eloquent\UserRepository;
+use App\Repository\UserRepositoryInterface;
+use App\Services\FileService\FileServiceInterface;
+use App\Services\FileService\LocalFileService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
@@ -22,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->register(RepositoryServiceProvider::class);
     }
 
     /**
@@ -32,6 +37,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // bindings
+        $this->app->bind(FileServiceInterface::class, function () {
+            return new LocalFileService();
+        });
+
         Route::model('student', Student::class, function ($student) {
             throw new StudentModelNotFoundException($student);
         });

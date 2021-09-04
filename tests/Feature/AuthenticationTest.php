@@ -24,7 +24,7 @@ class AuthenticationTest extends TestCase
     /* public function test_user_can_not_login_to_the_system_using_fake_credentials()
      {
          //login using fake credentials
-         $response = $this->postJson('/api/v1/login',[
+         $response = $this->postJson('/api/V1/login',[
               'emai' => 'fakemail.co',
               'password' => 'password'
           ], [
@@ -35,7 +35,7 @@ class AuthenticationTest extends TestCase
           $response->getContent();
           $response->assertStatus(422);
 
-         $response = $this->postJson('/api/v1/login', [
+         $response = $this->postJson('/api/V1/login', [
              'email'    => Student::all()->random()->email,
              'password' => 'password'
          ], [
@@ -50,7 +50,7 @@ class AuthenticationTest extends TestCase
     /* public function test_user_can_not_login_to_the_system_using_valid_credentials()
      {
          //login using valid credentials
-         $response = $this->postJson('/api/v1/login', [
+         $response = $this->postJson('/api/V1/login', [
              'email'    => Student::all()->random()->email,
              'password' => 'password'
          ], [
@@ -65,7 +65,7 @@ class AuthenticationTest extends TestCase
      public function test_user_can_not_register_to_the_system()
      {
          //login using valid credentials
-         $response = $this->postJson('/api/v1/register', [
+         $response = $this->postJson('/api/V1/register', [
              'full_name' => 'siril',
              'email'    => 'mals@gmail.com',
              'password' => 'password*L1',
@@ -82,7 +82,7 @@ class AuthenticationTest extends TestCase
 
     public function test_users_cannot_access_to_student_details_without_loggin()
     {
-        $response = $this->getJson('api/v1/students');
+        $response = $this->getJson('api/V1/students');
         $response->assertStatus(401);
     }
 
@@ -93,7 +93,7 @@ class AuthenticationTest extends TestCase
                 $query->where('name', 'admin');
             })->first();
 
-        $response = $this->actingAs($user, 'api')->getJson('api/v1/students');
+        $response = $this->actingAs($user, 'api')->getJson('api/V1/students');
         //dd($response->exception);
         echo $response->getContent();
         $response->assertStatus(200);

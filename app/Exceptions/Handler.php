@@ -106,6 +106,16 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (
+            NotFoundHttpException $exception,
+            $request
+        ) {
+            return $this->showError('Not Found',
+                $exception->getMessage() ? $exception->getMessage()
+                    : 'Invalid route',
+                null, $exception->getStatusCode());
+        });
+
+        $this->renderable(function (
             ThrottleRequestsException $exception
         ) {
             return $this->showError(Response::$statusTexts[Response::HTTP_TOO_MANY_REQUESTS],
@@ -113,7 +123,7 @@ class Handler extends ExceptionHandler
                 null, Response::HTTP_TOO_MANY_REQUESTS);
         });
 
-        if (!config('app.debug')) {
+        if (!config('app.debug') && config('app.env') === 'production') {
 
             $this->renderable(function (
                 QueryException $exception,
@@ -132,24 +142,17 @@ class Handler extends ExceptionHandler
                 $request
             ) {
                 return $this->showError('Error',
-                    $exception->getMessage(),
+                    $exception->getMessage() ? $exception->getMessage()
+                        : 'Internal server error',
                     null,
                     $exception->getStatusCode());
 
             });
 
         }
+
         // register custom exceptions
         $this->registerCustomMethods();
-
-        $this->renderable(function (
-            NotFoundHttpException $exception,
-            $request
-        ) {
-            return $this->showError('Not Found',
-                $exception->getMessage() ? $exception->getMessage() : 'Invalid route',
-                null, $exception->getStatusCode());
-        });
     }
 
     //end of register
@@ -167,7 +170,7 @@ class Handler extends ExceptionHandler
                     $this->dontFlash)->withErrors());
         }
 
-        return $this->showError($e->getMessage(), 'Validation Error', $errors,
+        return $this->showError('Validation Error', $e->getMessage(), $errors,
             $e->status);
     }
 

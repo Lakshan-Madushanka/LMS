@@ -25,7 +25,7 @@ class UserFunctionalityTest extends TestCase
         //removing email verified column
         unset($user['email_verified_at']);
         $response = $this->actingAs(User::all()->first(), 'api')
-            ->postJson('api/v1/users', $user);
+            ->postJson('api/V1/users', $user);
 
         $userCount = User::where('full_name', '=', 'kashan kumara')->get()
             ->count();
@@ -42,55 +42,67 @@ class UserFunctionalityTest extends TestCase
      test user detailes can be updated
     *
      */
-   /* public function test_user_cannot_update_email_verified_column_without_being_admin(
-    )
-    {
-        $user = $this->addUser(); // contain email verified column
+    /* public function test_user_cannot_update_email_verified_column_without_being_admin(
+     )
+     {
+         $user = $this->addUser(); // contain email verified column
 
-        $response1 = $this->actingAs(User::all()->first(), 'api')
-            ->postJson('api/v1/users', $user);
+         $response1 = $this->actingAs(User::all()->first(), 'api')
+             ->postJson('api/V1/users', $user);
 
-        $user2 = User::latest()->limit(1)->first();
-        $userId = $user2->id;
+         $user2 = User::latest()->limit(1)->first();
+         $userId = $user2->id;
 
-        $response2 = $this->actingAs($user2, 'api')
-            ->putJson("api/v1/users/{$userId}", $user);
+         $response2 = $this->actingAs($user2, 'api')
+             ->putJson("api/V1/users/{$userId}", $user);
 
-        // echo $response2->exception;
-        echo $response1->getContent();
-        $response1->assertStatus(403);
-        $response2->assertStatus(403);
+         // echo $response2->exception;
+         echo $response1->getContent();
+         $response1->assertStatus(403);
+         $response2->assertStatus(403);
 
-    }*/
+     }*/
 
-    public function test_only_admin_users_can_update_email_verified_column()
+    /*public function test_only_admin_users_can_update_email_verified_column()
     {
         //contain email verified column
         $adminUser = User::whereHas('roles', function (Builder $query) {
             $query->where('name', 'admin');
         })->first();
 
-
-
         $userId = User::latest()->limit(1)->first()->id;
 
         $response2 = $this->actingAs($adminUser, 'api')
-            ->patchJson("api/v1/users/{$userId}", $this->getUser());
+            ->patchJson("api/V1/users/{$userId}", $this->getUser());
 
-      //  echo $response2->exception;
-       // echo $response1->getContent();
+        //echo $response2->exception;
+        //echo $response1->getContent();
         //$response1->assertStatus(201);
         $response2->assertStatus(422);
 
+    }*/
+
+    public function test_user_can_be_deleted()
+    {
+       $user = User::all()->random()->first();
+
+       //echo request()->fullUrl();
+       //dd();
+
+        $response = $this->actingAs($user, 'api')->deleteJson("/api/V1/users/{$user->id}");
+
+        echo $response->exception;
+        $response->assertStatus(200);
     }
 
+    //////////////////////helper functions//////////////////////////////
     public function addUser()
     {
         $image = UploadedFile::fake()->image('user.jpg');
         $user = User::factory()->make([
             'nearest_town' => 'colombo',
-            'full_name'    => 'kashan kumara',
-            'n_i_c' => '123456789'
+            'full_name' => 'kashan kumara',
+            'n_i_c' => '123456789',
         ]);
         $user = $user->toArray();
         $user['password'] = 'Lakshgt$%22';

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Role;
 use App\Models\Student;
 use App\Models\User;
 use App\Policies\StudentPolicy;
@@ -32,6 +33,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+
+
         Password::defaults(function () {
             $rule = Password::min(8);
 
@@ -45,7 +48,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->defineGates();
 
         // passport services
-        Passport::routes(null, ['prefix' => 'api/v1/oauth']);
+        Passport::routes(null, ['prefix' => 'api/V1/oauth']);
         //Passport::hashClientSecrets();
         Passport::tokensExpireIn(now()->addDays(1500));
         Passport::refreshTokensExpireIn(now()->addDays(30));
@@ -55,23 +58,28 @@ class AuthServiceProvider extends ServiceProvider
 
     public function defineGates()
     {
-        Gate::define('isAdmin', function (User $user) {
-            return User::checkRoles($user, [1,2]);
-            // check if auth user is a admin, lecturer, or super_admin
-           /* return count(array_intersect([1, 2, 3],
-                    $user->roles->pluck('pivot.role_id')->toArray())) > 0;*/
-           /* return $user->whereHas('roles', function (Builder $query) {
-                $query->whereIn('name', ['lecturer', 'super_admin', 'admin']);
-            })->exists();*/
+        Gate::define('superAdmin', function (User $user) {
+
+            return in_array(Role::names['super_admin'],
+                $user->roles->pluck('id')->toArray());
         });
-        Gate::define('isManagement', function (User $user) {
-            return User::checkRoles($user, [1,2,3]);
-            // check if auth user is a admin, lecturer, or super_admin
-            /* return count(array_intersect([1, 2, 3],
-                     $user->roles->pluck('pivot.role_id')->toArray())) > 0;*/
-            /* return $user->whereHas('roles', function (Builder $query) {
-                 $query->whereIn('name', ['lecturer', 'super_admin', 'admin']);
-             })->exists();*/
+
+        Gate::define('administrative', function (User $user) {
+
+            return count(array_intersect([
+                    Role::names['super_admin'], Role::names['admin'],
+                ],
+                    $user->roles->pluck('id')->toArray())) > 0;
+        });
+
+        Gate::define('lecturer', function (User $user) {
+            return in_array(Role::names['lecturer'],
+                $user->roles->pluck('id')->toArray());
+        });
+
+        Gate::define('student', function (User $user) {
+            return in_array(Role::names['student'],
+                $user->roles->pluck('id')->toArray());
         });
     }
 

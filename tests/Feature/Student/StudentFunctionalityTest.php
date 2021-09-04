@@ -17,7 +17,7 @@ class StudentFunctionalityTest extends TestCase
 
     public function test_users_cannot_access_to_student_details_without_loggin()
     {
-        $response = $this->getJson('api/v1/students');
+        $response = $this->getJson('api/V1/students');
         $response->assertStatus(401);
     }
 
@@ -29,7 +29,7 @@ class StudentFunctionalityTest extends TestCase
                 $query->where('name', 'admin');
             })->first();
 
-        $response = $this->actingAs($user, 'api')->getJson('api/v1/students');
+        $response = $this->actingAs($user, 'api')->getJson('api/V1/students');
         //dd($response->exception);
         echo $response->getContent();
         $response->assertStatus(200);
@@ -43,7 +43,7 @@ class StudentFunctionalityTest extends TestCase
                 $query->where('name', 'student');
             })->first();
 
-        $response = $this->actingAs($user, 'api')->getJson('api/v1/students');
+        $response = $this->actingAs($user, 'api')->getJson('api/V1/students');
         //dd($response->exception);
         echo $response->getContent();
         $response->assertStatus(403);
@@ -64,7 +64,7 @@ class StudentFunctionalityTest extends TestCase
             })->first();
 
         $response = $this->actingAs($authUser, 'api')
-            ->getJson("api/v1/students/{$student->id}");
+            ->getJson("api/V1/students/{$student->id}");
         //dd($response->exception);
         echo $response->getContent();
         $response->assertJson(function (AssertableJson $json) use ($student) {
@@ -93,7 +93,7 @@ class StudentFunctionalityTest extends TestCase
             })->first();
 
         $response = $this->actingAs($student, 'api')
-            ->getJson("api/v1/students/{$student->id}");
+            ->getJson("api/V1/students/{$student->id}");
         //dd($response->exception);
         echo $response->getContent();
         $response->assertJson(function (AssertableJson $json) use ($student) {
@@ -122,7 +122,7 @@ class StudentFunctionalityTest extends TestCase
         $student1->roles()->attach(4);
 
         $response = $this->actingAs($student, 'api')
-            ->getJson("api/v1/students/{$student1->id}");
+            ->getJson("api/V1/students/{$student1->id}");
 
         $response->assertStatus(403);
     }

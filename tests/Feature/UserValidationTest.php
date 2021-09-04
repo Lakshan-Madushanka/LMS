@@ -50,7 +50,7 @@ class UserValidationTest extends TestCase
     {
         $userData = $this->userData;
         $userData[1] = 'lamal# madusha123';
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
@@ -62,28 +62,28 @@ class UserValidationTest extends TestCase
         $userData = $this->userData;
         $userData[0] = '199028764459'; //length 12
         //dd($this->loadUserData($userData));
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(200);
 
         $userData = $this->userData;
         $userData[0] = '199028764'; // length 9
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(200);
 
         $userData = $this->userData;
         $userData[0] = '19902'; //length 5
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
 
         $userData = $this->userData;
         $userData[0] = '19902abc'; //length 5 contain letters
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
@@ -93,14 +93,14 @@ class UserValidationTest extends TestCase
     {
         $userData = $this->userData;
         $userData[3] = 'kaduwela#$';
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
 
         $userData = $this->userData;
         $userData[3] = 'kaduwela';
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(200);
@@ -111,21 +111,21 @@ class UserValidationTest extends TestCase
         $userData = $this->userData;
         $userData[4] = 'female';
         //dd($this->loadUserData($userData));
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(200);
 
         $userData = $this->userData;
         $userData[4] = 'female';
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(200);
 
         $userData = $this->userData;
         $userData[4] = 'gender';
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
@@ -136,19 +136,19 @@ class UserValidationTest extends TestCase
         $userData = $this->userData;
         $userData[6] = 'lamal'; // invalid email
         //dd($this->loadUserData($userData));
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
 
         $userData[6] = 'lamal@gmail.com'; // valid email
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(200);
 
        /* $userData[6] = 'lamal@gmail.com'; // entered already exists email
-        $response1 = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response1 = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response1->assertStatus(422);*/
@@ -159,31 +159,31 @@ class UserValidationTest extends TestCase
         $userData = $this->userData;
         $userData[7] = 'passw'; // length less than 7
         //dd($this->loadUserData($userData))5
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
 
         $userData[7] = 'password'; // number not included
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
 
         $userData[7] = 'password@'; // miss case not included
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
 
         $userData[7] = 'passworD'; // symbol not included
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(422);
 
         $userData[7] = 'passworD$%98'; // should be valid
-        $response = $this->postJson('api/v1/students', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/students', $this->loadUserData($userData));
         //dd($response->exception);
         echo $response->content();
         $response->assertStatus(200);
@@ -193,7 +193,7 @@ class UserValidationTest extends TestCase
     {
         $userData = $this->userData;
         $userData['image']  = UploadedFile::fake()->image('user1.jpg'); //mime type is ok
-        $response = $this->postJson('api/v1/users', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/users', $this->loadUserData($userData));
         echo $response->getContent();
         echo $response->exception;
         $response->assertStatus(201);
@@ -203,7 +203,7 @@ class UserValidationTest extends TestCase
     {
         $userData = $this->userData;
         $userData['image']  = UploadedFile::fake()->image('user1.mp3'); //mime type is ok
-        $response = $this->postJson('api/v1/users', $this->loadUserData($userData));
+        $response = $this->postJson('api/V1/users', $this->loadUserData($userData));
         echo $response->getContent();
         echo $response->exception;
         $response->assertStatus(422);

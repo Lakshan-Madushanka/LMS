@@ -2,11 +2,12 @@
 
 use App\Exceptions\StudentModelNotFoundException;
 use App\Http\Controllers\CourseController;
-use App\Http\Controllers\v1\Auth\GoogleLoginController;
-use App\Http\Controllers\v1\Auth\PasswordResetController;
-use App\Http\Controllers\v1\Auth\VerifyEmailController;
-use App\Http\Controllers\v1\Student\StudentController;
-use App\Http\Controllers\v1\User\UserController;
+use App\Http\Controllers\V1\Auth\GoogleLoginController;
+use App\Http\Controllers\V1\Auth\PasswordResetController;
+use App\Http\Controllers\V1\Auth\VerifyEmailController;
+use App\Http\Controllers\V1\Payment\PaymentController;
+use App\Http\Controllers\V1\Student\StudentController;
+use App\Http\Controllers\V1\User\UserController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -54,9 +55,14 @@ Route::apiResource('users', UserController::class)->except([
     'index', 'show',
 ]);
 
+Route::get('users/search', [UserController::class, 'fullTextSearch']);
+
+Route::apiResource('users.roles', UserController::class)->shallow();
+
 Route::apiResource('students', StudentController::class);
 
 Route::apiResource('courses', CourseController::class);
 
+///////////////////////////////// courses payments///////////////////////////////////////////////////////
 
-
+Route::get('payments/stripe', [PaymentController::class, 'test']);

@@ -19,6 +19,7 @@ class CreateUserCourseTable extends Migration
             $table->foreignId('user_id');
             $table->boolean('course_in_charge')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
